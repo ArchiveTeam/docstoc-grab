@@ -82,6 +82,8 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
     check("http://docs.docstoc.com/did/"..mem_id.."/"..doc_id..".did?rev=1")
     check("http://viewerdata.docstoc.com/getDocumentInfo.ashx?doc_id="..doc_id.."&host_url="..url.."&mem_id="..mem_id)
     check("http://docs.docstoc.com/did/"..mem_id.."/"..doc_id..".did")
+    check("http://embed.docstoc.com/handlers/downloadfilefromflash.ashx?docid="..doc_id.."&ref_url="..doc_ref)
+    check("http://embed.docstoc.com/handlers/downloadfilefromflash.ashx?docid="..doc_id)
   end
   
   if item_type == '100documents' and string.match(url, "https?://[^/]*docstoc%.com") then

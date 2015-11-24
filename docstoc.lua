@@ -116,6 +116,10 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     return wget.actions.EXIT
   end
 
+  if status_code == 301 and string.match(url["url"], "^http://www%.docstoc%.com/docs/"..item_value.."[0-9][0-9]$") then
+    return wget.actions.EXIT
+  end
+
   if (status_code >= 200 and status_code <= 399) then
     if string.match(url.url, "https://") then
       local newurl = string.gsub(url.url, "https://", "http://")

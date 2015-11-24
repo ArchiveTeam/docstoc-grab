@@ -74,8 +74,8 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
   end
 
   if string.match(url, "^https?://swf%.docstoc%.com") and string.match(url, "doc_id=") and string.match(url, "mem_id=") and string.match(url, "ref=") then
-    mem_id = string.match(url, "mem_id=([0-9]+)")
-    doc_id = string.match(url, "doc_id=([0-9]+)")
+    mem_id = string.match(url, "mem_id=([0-9%-]+)")
+    doc_id = string.match(url, "doc_id=([0-9%-]+)")
     doc_ref = string.match(url, "ref=([^&]+)")
     check("http://embed.docstoc.com/Flash.asmx/StoreReffer?docID="..doc_id.."&url="..doc_ref)
     check("http://docs.docstoc.com/did/"..mem_id.."/"..doc_id..".did?rev=0")

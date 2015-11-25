@@ -6,10 +6,6 @@ local tries = 0
 local item_type = os.getenv('item_type')
 local item_value = os.getenv('item_value')
 
-local doc_id = nil
-local mem_id = nil
-local doc_ref = nil
-
 local downloaded = {}
 local addedtolist = {}
 
@@ -74,12 +70,13 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
   end
 
   if string.match(url, "^https?://swf%.docstoc%.com") and string.match(url, "doc_id=") and string.match(url, "mem_id=") and string.match(url, "ref=") then
-    mem_id = string.match(url, "mem_id=([0-9%-]+)")
-    doc_id = string.match(url, "doc_id=([0-9%-]+)")
-    doc_ref = string.match(url, "ref=([^&]+)")
+    local mem_id = string.match(url, "mem_id=([0-9%-]+)")
+    local doc_id = string.match(url, "doc_id=([0-9%-]+)")
+    local doc_ref = string.match(url, "ref=([^&]+)")
+
     check("http://embed.docstoc.com/Flash.asmx/StoreReffer?docID="..doc_id.."&url="..doc_ref)
     check("http://docs.docstoc.com/did/"..mem_id.."/"..doc_id..".did?rev=0")
-    check("http://docs.docstoc.com/did/"..mem_id.."/"..doc_id..".did?rev=1")
+--    check("http://docs.docstoc.com/did/"..mem_id.."/"..doc_id..".did?rev=1")
     check("http://viewerdata.docstoc.com/getDocumentInfo.ashx?doc_id="..doc_id.."&host_url="..url.."&mem_id="..mem_id)
     check("http://docs.docstoc.com/did/"..mem_id.."/"..doc_id..".did")
     check("http://embed.docstoc.com/handlers/downloadfilefromflash.ashx?docid="..doc_id.."&ref_url="..doc_ref)
@@ -120,6 +117,23 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
     return wget.actions.EXIT
   end
 
+  -- try to find and prevent loops
+  for part in string.gmatch(url["url"], "([^/]*)") do
+    if string.match(url["url"], "/"..part.."/"..part.."/"..part) then
+      return wget.actions.EXIT
+    end
+  end
+  for part in string.gmatch(url["url"], "([^/]*/[^/]*)") do
+    if string.match(url["url"], "/"..part.."/"..part) then
+      return wget.actions.EXIT
+    end
+  end
+  for part in string.gmatch(url["url"], "([^/]*/[^/]*/[^/]*)") do
+    if string.match(url["url"], "/"..part.."/"..part) then
+      return wget.actions.EXIT
+    end
+  end
+
   if (status_code >= 200 and status_code <= 399) then
     if string.match(url.url, "https://") then
       local newurl = string.gsub(url.url, "https://", "http://")
@@ -146,7 +160,7 @@ wget.callbacks.httploop_result = function(url, err, http_stat)
   elseif status_code == 0 then
     io.stdout:write("\nServer returned "..http_stat.statcode.." ("..err.."). Sleeping.\n")
     io.stdout:flush()
-    os.execute("sleep 10")
+    os.execute("sleep 1")
     tries = tries + 1
     if tries >= 5 then
       io.stdout:write("\nI give up...\n")

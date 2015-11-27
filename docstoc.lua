@@ -64,8 +64,6 @@ wget.callbacks.get_urls = function(file, url, is_css, iri)
       check("http:"..newurl)
     elseif string.match(newurl, "^/") then
       check(string.match(url, "^(https?://[^/]+)")..newurl)
-    elseif string.match(newurl, "%.jpg$") or string.match(newurl, "%.gif$") or string.match(newurl, "%.png$") then
-      check(string.match(url, "^(https?://.+/)")..newurl)
     end
   end
 
